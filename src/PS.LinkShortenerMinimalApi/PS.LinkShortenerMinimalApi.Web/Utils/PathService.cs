@@ -7,7 +7,12 @@ namespace PS.LinkShortenerMinimalApi.Web.Utils
         public string GetDataFilePath(string fileName)
         {
             string basePath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, @"..\..\.."));
-            return Path.Combine(basePath, "Data", fileName);
+            string dataPath = Path.Combine(basePath, "Data");
+
+            if (!Directory.Exists(dataPath))
+                Directory.CreateDirectory(dataPath);
+
+            return Path.Combine(dataPath, fileName);
         }
     }
 }

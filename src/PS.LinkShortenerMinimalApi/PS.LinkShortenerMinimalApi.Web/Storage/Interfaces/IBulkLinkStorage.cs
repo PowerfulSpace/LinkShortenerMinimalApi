@@ -2,5 +2,6 @@
 {
     public interface IBulkLinkStorage : ILinkStorage
     {
+        Dictionary<string, string> GetAll();
     }
 }

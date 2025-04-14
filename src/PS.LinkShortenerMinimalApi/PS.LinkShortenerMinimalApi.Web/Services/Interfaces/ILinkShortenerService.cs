@@ -2,5 +2,8 @@
 {
     public interface ILinkShortenerService
     {
+        string Shorten(string longUrl);
+
+        string? Expand(string shortUrl);
     }
 }

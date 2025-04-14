@@ -2,5 +2,6 @@
 {
     public class LinkResponse
     {
+        public string ShortUrl { get; set; } = string.Empty;
     }
 }

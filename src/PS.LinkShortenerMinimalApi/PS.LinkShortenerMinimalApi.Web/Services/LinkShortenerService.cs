@@ -6,7 +6,7 @@ namespace PS.LinkShortenerMinimalApi.Web.Services
     public class LinkShortenerService : ILinkShortenerService
     {
         private readonly ILinkStorage _storage;
-        const string BaseUrl = "http://sho.com/";
+        const string BaseUrl = "https://localhost:7241/";
 
         public LinkShortenerService(ILinkStorage storage)
         {

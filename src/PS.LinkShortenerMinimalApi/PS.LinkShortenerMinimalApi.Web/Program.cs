@@ -33,9 +33,11 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSingleton<ILinkStorage>(provider =>
 {
-    var connection = "localhost:6379";
-    return new RedisLinkStorage(connection);
+    var config = provider.GetRequiredService<IConfiguration>();
+    var redisConnection = config.GetSection("Redis")["ConnectionString"];
+    return new RedisLinkStorage(redisConnection);
 });
+
 builder.Services.AddSingleton<ILinkShortenerService, LinkShortenerService>();
 
 

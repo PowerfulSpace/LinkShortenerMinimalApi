@@ -20,24 +20,23 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Регистрация сервисов
-builder.Services.AddSingleton<IPathService, PathService>();
+//builder.Services.AddSingleton<IPathService, PathService>();
+//builder.Services.AddSingleton<ILinkStorage>(provider =>
+//{
+//    var pathService = provider.GetRequiredService<IPathService>();
+//    var filePath = pathService.GetDataFilePath("links.json");
+//    return new JsonLinkStorage(filePath);
+//});
+//builder.Services.AddSingleton<ILinkShortenerService, LinkShortenerService>();
+
+
+
 builder.Services.AddSingleton<ILinkStorage>(provider =>
 {
-    var pathService = provider.GetRequiredService<IPathService>();
-    var filePath = pathService.GetDataFilePath("links.json");
-    return new JsonLinkStorage(filePath);
+    var connection = "localhost:6379";
+    return new RedisLinkStorage(connection);
 });
 builder.Services.AddSingleton<ILinkShortenerService, LinkShortenerService>();
-
-//builder.Services.AddCors(options =>
-//{
-//    options.AddDefaultPolicy(policy =>
-//    {
-//        policy.WithOrigins("http://localhost:5050", "https://localhost:7241")
-//              .AllowAnyHeader()
-//              .AllowAnyMethod();
-//    });
-//});
 
 
 var app = builder.Build();

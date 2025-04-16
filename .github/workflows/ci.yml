@@ -24,3 +24,7 @@ jobs:
 
     - name: Build
       run: dotnet build src/PS.LinkShortenerMinimalApi/PS.LinkShortenerMinimalApi.Web --no-restore --configuration Release
+
+    - name: Build Docker image
+      run: docker build -t linkshortener:latest ./src/PS.LinkShortenerMinimalApi/PS.LinkShortenerMinimalApi.Web
+

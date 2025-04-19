@@ -6,15 +6,22 @@ WORKDIR /app
 COPY *.csproj ./
 RUN dotnet restore
 
-# Копируем всё и собираем
+# Копируем остальной код и билдим
 COPY . ./
 RUN dotnet publish -c Release -o /out
 
 # Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
-COPY --from=build /out .
 
-EXPOSE 80
+# Устанавливаем переменную окружения
+ENV ASPNETCORE_ENVIRONMENT=Docker
 
+# Копируем билд
+COPY --from=build /out ./
+
+# Открываем порт (внутренний)
+EXPOSE 8080
+
+# Точка входа
 ENTRYPOINT ["dotnet", "PS.LinkShortenerMinimalApi.Web.dll"]

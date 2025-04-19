@@ -1,23 +1,15 @@
-﻿using Microsoft.OpenApi.Models;
-using PS.LinkShortenerMinimalApi.Web.Models;
-using PS.LinkShortenerMinimalApi.Web.Services.Interfaces;
+﻿using PS.LinkShortenerMinimalApi.Web.Models;
 using PS.LinkShortenerMinimalApi.Web.Services;
-using PS.LinkShortenerMinimalApi.Web.Storage.Interfaces;
+using PS.LinkShortenerMinimalApi.Web.Services.Interfaces;
 using PS.LinkShortenerMinimalApi.Web.Storage;
-using PS.LinkShortenerMinimalApi.Web.Utils.Interfaces;
-using PS.LinkShortenerMinimalApi.Web.Utils;
+using PS.LinkShortenerMinimalApi.Web.Storage.Interfaces;
 
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "LinkShortener API", Version = "v1" });
-});
+
 
 // Регистрация сервисов
 //builder.Services.AddSingleton<IPathService, PathService>();
@@ -30,15 +22,20 @@ builder.Services.AddSwaggerGen(c =>
 //builder.Services.AddSingleton<ILinkShortenerService, LinkShortenerService>();
 
 
+// Настройка конфигурации
+builder.Services.Configure<ShortenerSettings>(builder.Configuration.GetSection("Shortener"));
 
-builder.Services.AddSingleton<ILinkStorage>(provider =>
-{
-    var config = provider.GetRequiredService<IConfiguration>();
-    var redisConnection = config.GetSection("Redis")["ConnectionString"];
-    return new RedisLinkStorage(redisConnection);
-});
+// Регистрация Redis хранилища
+string redisConnection = builder.Configuration.GetSection("Redis")["ConnectionString"]!;
+builder.Services.AddSingleton<ILinkStorage>(new RedisLinkStorage(redisConnection));
 
+// Регистрация сервиса сокращения ссылок
 builder.Services.AddSingleton<ILinkShortenerService, LinkShortenerService>();
+
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
@@ -87,9 +84,11 @@ app.MapGet("/expand", (string shortUrl, ILinkShortenerService service) =>
 
 
 // GET /{code} => redirect
-app.MapGet("/{code}", (string code, ILinkShortenerService service) =>
+app.MapGet("/r/{code}", (string code, ILinkShortenerService service) =>
 {
-    var shortUrl = $"https://localhost:7241/{code}";
+    string baseUrl = builder.Configuration.GetSection("Shortener")["BaseUrl"]!.TrimEnd('/');
+
+    var shortUrl = $"{baseUrl}/r/{code}";
     var longUrl = service.Expand(shortUrl);
 
     return longUrl is not null

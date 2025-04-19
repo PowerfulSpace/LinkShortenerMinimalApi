@@ -1,4 +1,6 @@
-﻿using PS.LinkShortenerMinimalApi.Web.Services.Interfaces;
+﻿using Microsoft.Extensions.Options;
+using PS.LinkShortenerMinimalApi.Web.Models;
+using PS.LinkShortenerMinimalApi.Web.Services.Interfaces;
 using PS.LinkShortenerMinimalApi.Web.Storage.Interfaces;
 
 namespace PS.LinkShortenerMinimalApi.Web.Services
@@ -6,12 +8,14 @@ namespace PS.LinkShortenerMinimalApi.Web.Services
     public class LinkShortenerService : ILinkShortenerService
     {
         private readonly ILinkStorage _storage;
-        const string BaseUrl = "https://localhost:7241/";
+        private readonly string _baseUrl;
 
-        public LinkShortenerService(ILinkStorage storage)
+        public LinkShortenerService(ILinkStorage storage, IOptions<ShortenerSettings> options)
         {
             _storage = storage;
+            _baseUrl = options.Value.BaseUrl.TrimEnd('/');
         }
+
 
         public string Shorten(string longUrl)
         {
@@ -21,7 +25,7 @@ namespace PS.LinkShortenerMinimalApi.Web.Services
             do
             {
                 code = GenerateShortCode();
-                shortLink = $"{BaseUrl}{code}";
+                shortLink = $"{_baseUrl}/r/{code}";
             }
             while (_storage.TryGet(shortLink, out _));
 

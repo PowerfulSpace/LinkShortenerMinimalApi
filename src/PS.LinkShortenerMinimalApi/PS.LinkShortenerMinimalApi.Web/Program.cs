@@ -11,15 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 
-// Регистрация сервисов
-//builder.Services.AddSingleton<IPathService, PathService>();
-//builder.Services.AddSingleton<ILinkStorage>(provider =>
-//{
-//    var pathService = provider.GetRequiredService<IPathService>();
-//    var filePath = pathService.GetDataFilePath("links.json");
-//    return new JsonLinkStorage(filePath);
-//});
-//builder.Services.AddSingleton<ILinkShortenerService, LinkShortenerService>();
+
 
 
 // Настройка конфигурации

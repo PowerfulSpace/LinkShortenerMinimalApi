@@ -29,4 +29,4 @@ jobs:
           context: ./src/PS.LinkShortenerMinimalApi/PS.LinkShortenerMinimalApi.Web
           file: ./src/PS.LinkShortenerMinimalApi/PS.LinkShortenerMinimalApi.Web/Dockerfile
           push: true
-          tags: powerfulspace/linkshortener:latest
+          tags: powerful95/url_shortener_project:latest

@@ -9,8 +9,6 @@ using PS.LinkShortenerMinimalApi.Web.Storage.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
 // Регистрация сервисов
 //builder.Services.AddSingleton<IPathService, PathService>();
 //builder.Services.AddSingleton<ILinkStorage>(provider =>

@@ -37,62 +37,64 @@ builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
-
-
-
-
-
-
-
-// Swagger
-if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
+
+    // Swagger
+    if (app.Environment.IsDevelopment())
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "LinkShortener API v1");
-    });
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "LinkShortener API v1");
+        });
+    }
+
+    app.UseHttpsRedirection();
+
+
+    app.MapGet("/", () => Results.Redirect("/swagger"));
+
+    // POST /shorten
+    app.MapPost("/shorten", (LinkRequest request, ILinkShortenerService service) =>
+    {
+        var shortUrl = service.Shorten(request.LongUrl);
+        return Results.Ok(new LinkResponse { ShortUrl = shortUrl });
+    })
+    .WithName("ShortenUrl")
+    .WithOpenApi();
+
+
+    // GET /expand?shortUrl=...
+    app.MapGet("/expand", (string shortUrl, ILinkShortenerService service) =>
+    {
+        var longUrl = service.Expand(shortUrl);
+        return longUrl is not null
+            ? Results.Ok(longUrl)
+            : Results.NotFound("Ссылка не найдена");
+    })
+    .WithName("ExpandUrl")
+    .WithOpenApi();
+
+
+    // GET /{code} => redirect
+    app.MapGet("/r/{code}", (string code, ILinkShortenerService service) =>
+    {
+        string baseUrl = builder.Configuration.GetSection("Shortener")["BaseUrl"]!.TrimEnd('/');
+
+        var shortUrl = $"{baseUrl}/r/{code}";
+        var longUrl = service.Expand(shortUrl);
+
+        return longUrl is not null
+            ? Results.Redirect(longUrl)
+            : Results.NotFound("Короткая ссылка не найдена");
+    })
+    .WithName("RedirectToLongUrl");
+
+    app.Run();
 }
 
-app.UseHttpsRedirection();
 
 
-app.MapGet("/", () => Results.Redirect("/swagger"));
-
-// POST /shorten
-app.MapPost("/shorten", (LinkRequest request, ILinkShortenerService service) =>
-{
-    var shortUrl = service.Shorten(request.LongUrl);
-    return Results.Ok(new LinkResponse { ShortUrl = shortUrl });
-})
-.WithName("ShortenUrl")
-.WithOpenApi();
 
 
-// GET /expand?shortUrl=...
-app.MapGet("/expand", (string shortUrl, ILinkShortenerService service) =>
-{
-    var longUrl = service.Expand(shortUrl);
-    return longUrl is not null
-        ? Results.Ok(longUrl)
-        : Results.NotFound("Ссылка не найдена");
-})
-.WithName("ExpandUrl")
-.WithOpenApi();
 
-
-// GET /{code} => redirect
-app.MapGet("/r/{code}", (string code, ILinkShortenerService service) =>
-{
-    string baseUrl = builder.Configuration.GetSection("Shortener")["BaseUrl"]!.TrimEnd('/');
-
-    var shortUrl = $"{baseUrl}/r/{code}";
-    var longUrl = service.Expand(shortUrl);
-
-    return longUrl is not null
-        ? Results.Redirect(longUrl)
-        : Results.NotFound("Короткая ссылка не найдена");
-})
-.WithName("RedirectToLongUrl");
-
-app.Run();

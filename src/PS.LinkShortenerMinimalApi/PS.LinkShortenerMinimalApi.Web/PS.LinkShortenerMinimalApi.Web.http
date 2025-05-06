@@ -1,6 +1,3 @@
 @PS.LinkShortenerMinimalApi.Web_HostAddress = http://localhost:5050
 
-GET {{PS.LinkShortenerMinimalApi.Web_HostAddress}}/weatherforecast/
-Accept: application/json
-
 ###
